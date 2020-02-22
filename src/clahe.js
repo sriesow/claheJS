@@ -7,22 +7,18 @@ export class CLAHE {
     this.tilesY = tilesY;
     this.limit = limit;
     this.histSize = 256;
+    this.tileSize = [];
   }
 
-  CLAHE_IMPL(inputArray, height, width) {
-    this.CLAHE_CalcLut_Body(inputArray, height, width);
-  }
-
-  CLAHE_CalcLut_Body(inputArray, height, width) {
-    let tileSize = [];
-    tileSize[0] = width / this.tilesX;
-    tileSize[1] = height / this.tilesY;
+  calculateLUTBody(inputArray, height, width) {
+    this.tileSize[0] = width / this.tilesX;
+    this.tileSize[1] = height / this.tilesY;
 
     let srcForLut = inputArray.clone();
     let tileHist = nj.zeros([this.tilesX * this.tilesY, this.histSize]);
     let lutArray = nj.zeros([this.tilesX * this.tilesY, this.histSize]);
 
-    let tileSizeTotal = tileSize[0] * tileSize[1];
+    let tileSizeTotal = this.tileSize[0] * this.tileSize[1];
     const lutScale = (this.histSize - 1) / tileSizeTotal;
 
     let clipLimit = 0;
@@ -34,10 +30,10 @@ export class CLAHE {
     // Calculate Histogram
     for (let i = 0; i < this.tilesY; i++) {
       for (let j = 0; j < this.tilesX; j++) {
-        let startX = i * tileSize[0];
-        let endX = startX + tileSize[0];
-        let startY = j * tileSize[1];
-        let endY = startY + tileSize[1];
+        let startX = i * this.tileSize[0];
+        let endX = startX + this.tileSize[0];
+        let startY = j * this.tileSize[1];
+        let endY = startY + this.tileSize[1];
         let numBlock = i + this.tilesX * j;
         for (let ii = startX; ii < endX; ii++) {
           for (let jj = startY; jj < endY; jj++) {
@@ -90,6 +86,40 @@ export class CLAHE {
     }
     return lutArray;
   }
+
+  calculateInterpolationBody(srcArray, lutArray, height, width){
+    let dstArray = srcArray.clone();
+    for (let i = 0; i < width; i++) {
+      for (let j = 0; j < height; j++) {
+        if(i <= this.tileSize[0]/2 && j<= this.tileSize[1]/2){
+          let tempVal = 0;
+          let srcVal = dstArray.get(j, i);
+          let finalVal = parseInt(lutArray.get(tempVal,srcVal) * 255);
+          dstArray.set(j,i, finalVal);
+        }
+        else if(i<= this.tileSize[0]/2 && j >= ((this.tilesX-1)*this.tileSize[1] + this.tileSize[1]/2)){
+          let tempVal = this.tilesX*(this.tilesX-1);
+          let srcVal = dstArray.get(j, i);
+          let finalVal = parseInt(lutArray.get(tempVal,srcVal) * 255);
+          dstArray.set(j,i, finalVal);
+        }
+        else if(i >= ((this.tilesX-1)*this.tileSize[0] + this.tileSize[0]/2) && j<= this.tileSize[1]/2){
+          let tempVal = this.tilesX-1;
+          let srcVal = dstArray.get(j, i);
+          let finalVal = parseInt(lutArray.get(tempVal,srcVal) * 255);
+          dstArray.set(j,i, finalVal);
+        }
+        else if(i>=() && j>=())
+      }
+      
+    }
+  }
+
+  CLAHE_IMPL(inputArray, height, width) {
+    let lutArray = this.calculateLUTBody(inputArray, height, width);
+    let outputArray = this.calculateInterpolationBody(inputArray, lutArray, height, width);
+  }
+
 }
 
 let claheObj = new CLAHE(4.0, 2, 2);
