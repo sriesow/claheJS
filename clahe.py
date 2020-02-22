@@ -63,7 +63,6 @@ def claheGO(src, _step=2):
                     C2[num][k] = 1.0 * tmp2[num][k] / total
                 else:
                     C2[num][k] = C2[num][k-1] + 1.0 * tmp2[num][k] / total
-            print(C2[num])
             # print("altern", (C2[num]*255).astype(np.uint8))
     for i in range(width):
         for j in range(height):
@@ -91,8 +90,8 @@ def claheGO(src, _step=2):
             elif(i >= ((block-1)*width_block+width_block/2)):
                 num_i = block-1
                 num_j = int((j - height_block/2)/height_block)
-                num1 = num_j*block + num_i
-                num2 = num1 + block
+                num1 = int(num_j*block + num_i)
+                num2 = int(num1 + block)
                 p = (j - (num_j*height_block+height_block/2))/(1.0*height_block)
                 q = 1-p
                 CLAHE_GO[j][i] = (int)(
