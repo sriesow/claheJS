@@ -1,14 +1,129 @@
-// let nj = require('numjs');
-import * as nj from numjs.min.js;
-nj.config.printThreshold = 300;
-
-export class CLAHE {
+export class claheEqualization {
   constructor(limit, tilesX, tilesY) {
     this.tilesX = tilesX;
     this.tilesY = tilesY;
     this.limit = limit;
     this.histSize = 256;
     this.tileSize = [];
+  }
+
+  async convertCLAHE(imageData, width, height) {
+    let hueArray = [];
+    let saturationArray = [];
+    let luminanceArray = [];
+    for (let i = 0; i < imageData.length; i = i + 4) {
+      let HSLObject = this.RGBToHSL(
+        imageData[i],
+        imageData[i + 1],
+        imageData[i + 2]
+      );
+      hueArray.push(HSLObject[0]);
+      saturationArray.push(HSLObject[1]);
+      luminanceArray.push(HSLObject[2]);
+    }
+
+    let myCanvas = document.createElement('canvas');
+    myCanvas.width = width;
+    myCanvas.height = height;
+    let newImageData = myCanvas
+      .getContext('2d')
+      .createImageData(myCanvas.width, myCanvas.height);
+
+    inputArray = luminanceArray;
+    let lutArray = this.calculateLUTBody(inputArray, height, width);
+    let outputArray = this.calculateInterpolationBody(
+      inputArray,
+      lutArray,
+      height,
+      width
+    );
+    let claheModifiedArray = outputArray.flatten().tolist();
+
+    for (let y = 0; y < myCanvas.height; y++) {
+      for (let x = 0; x < myCanvas.width; x++) {
+        let a = (y * myCanvas.width + x) * 4;
+        newImageData.data[a] = hueArray[a];
+        newImageData.data[a + 1] = saturationArray[a];
+        newImageData.data[a + 2] = claheModifiedArray[a];
+        newImageData.data[a + 3] = 1;
+      }
+    }
+    let RGBFinalValues = this.hslToImageData(newImageData.data, width, height);
+    return RGBFinalValues;
+  }
+
+  RGBToHSL(r, g, b) {
+    (r /= 255), (g /= 255), (b /= 255);
+    var max = Math.max(r, g, b),
+      min = Math.min(r, g, b);
+    var h,
+      s,
+      l = (max + min) / 2;
+
+    if (max == min) {
+      h = s = 0; // achromatic
+    } else {
+      var d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
+      }
+      h /= 6;
+    }
+
+    return [parseInt(h * 360), parseInt(s * 100), parseInt(l * 100)];
+  }
+
+  hslToRgb(h, s, l) {
+    var r, g, b;
+    var h = h / 360;
+    var s = s / 100;
+    var l = l / 100;
+    if (s == 0) {
+      r = g = b = l; // achromatic
+    } else {
+      var hue2rgb = function hue2rgb(p, q, t) {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      };
+
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      var p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
+    }
+
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  }
+
+  hslToImageData(pixels, width, height) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.createImageData(width, height);
+
+    // Iterate through every pixel
+    for (let i = 0; i < pixels.length; i += 4) {
+      // Modify pixel data
+      let RGB = this.hslToRgb(pixels[i], pixels[i + 1], pixels[i + 2]);
+      imageData.data[i + 0] = RGB[0]; // R value
+      imageData.data[i + 1] = RGB[1]; // G value
+      imageData.data[i + 2] = RGB[2]; // B value
+      imageData.data[i + 3] = 255;
+    }
+    return imageData;
   }
 
   calculateLUTBody(inputArray, height, width) {
@@ -83,8 +198,6 @@ export class CLAHE {
             tileHist.get(numBlock, i) / tileSizeTotal;
           lutArray.set(numBlock, i, tempVal);
         }
-        // console.log(tileHist.pick(numBlock, null), lutArray.pick(numBlock, null));
-        // console.log(lutArray.pick(numBlock, null));
       }
     }
     return lutArray;
@@ -220,40 +333,4 @@ export class CLAHE {
     }
     return dstArray;
   }
-
-  CLAHE_IMPL(inputArray, height, width) {
-    let lutArray = this.calculateLUTBody(inputArray, height, width);
-    // console.log(lutArray);
-    let outputArray = this.calculateInterpolationBody(
-      inputArray,
-      lutArray,
-      height,
-      width
-    );
-    let finalarray = outputArray.flatten().tolist();
-    console.log(finalarray);
-    console.log(finalarray[1]);
-  }
 }
-
-let claheObj = new CLAHE(4.0, 2, 2);
-let inputArray = [
-  72,
-  136,
-  128,
-  59,
-  223,
-  85,
-  252,
-  75,
-  246,
-  84,
-  111,
-  107,
-  249,
-  245,
-  229,
-  94
-];
-let njArray = nj.array(inputArray).reshape(4, 4);
-claheObj.CLAHE_IMPL(njArray, 4, 4);
