@@ -1,0 +1,1 @@
+/usr/bin/clang++  -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/sample.dir/sample.cpp.o  -o sample  /usr/local/lib/libopencv_core.a /usr/local/lib/libopencv_imgcodecs.a /usr/local/lib/libopencv_imgproc.a /usr/local/lib/libopencv_core.a /usr/lib/libz.dylib -framework Accelerate -lm -ldl 

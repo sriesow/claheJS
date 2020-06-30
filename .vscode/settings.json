@@ -1,0 +1,11 @@
+{
+    "python.pythonPath": "/Users/srie/anaconda3/envs/openinference/bin/python",
+    "cmake.configureOnOpen": true,
+    "files.associations": {
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "vector": "cpp"
+    },
+    "C_Cpp.default.includePath": null,
+    "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools"
+}

@@ -18,7 +18,7 @@ def interpolationBody(src, dst, lut, tileSize, block):
         tx1 = math.floor(txf)
         tx2 = tx1 + 1
 
-        xa_p.append(txf - tx1)
+        xa_p.append(float("%0.2f" % (txf - tx1)))
         xa1_p.append(1 - xa_p[i])
 
         tx1 = max(tx1, 0)
@@ -36,7 +36,7 @@ def interpolationBody(src, dst, lut, tileSize, block):
         ty1 = math.floor(tyf)
         ty2 = ty1 + 1
 
-        ya = tyf - ty1
+        ya = float("%0.2f" % (tyf - ty1))
         ya1 = 1 - ya
 
         ty1 = max(ty1, 0)
@@ -52,6 +52,8 @@ def interpolationBody(src, dst, lut, tileSize, block):
             ind2 = ind2_p[j] + srcVal
             # print('stats',lutIndex1, lutIndex2, ind1, ind2)
             # print('val', lut[lutIndex1][ind1], lut[lutIndex1][ind2], lut[lutIndex2][ind1], lut[lutIndex2][ind2])
+
+            lutBlock1Residue
             result = (lut[lutIndex1][ind1] * xa1_p[j] +
                       lut[lutIndex1][ind2] * xa_p[j]) * ya1 + (lut[lutIndex2][ind1] * xa1_p[j] + lut[lutIndex2][ind2] * xa_p[j]) * ya
             # print('result' , i, j, result)

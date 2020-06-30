@@ -1,0 +1,3 @@
+/Users/srie/Documents/Upwork/Scott/git_codes/claheJS/CMakeFiles/rebuild_cache.dir
+/Users/srie/Documents/Upwork/Scott/git_codes/claheJS/CMakeFiles/edit_cache.dir
+/Users/srie/Documents/Upwork/Scott/git_codes/claheJS/CMakeFiles/sample.dir

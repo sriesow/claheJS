@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/Users/srie/Documents/Upwork/Scott/git_codes/claheJS/build",
+  "command": "/usr/bin/clang++   -isystem /usr/local/include/opencv4  -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk   -std=gnu++11 -o CMakeFiles/sample.dir/sample.cpp.o -c /Users/srie/Documents/Upwork/Scott/git_codes/claheJS/sample.cpp",
+  "file": "/Users/srie/Documents/Upwork/Scott/git_codes/claheJS/sample.cpp"
+}
+]
